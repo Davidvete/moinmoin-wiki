@@ -25,10 +25,10 @@ RUN apt-get update && apt-get install -qqy --no-install-recommends \
 # Download MoinMoin
 RUN curl -OkL \
   https://github.com/moinwiki/moin-1.9/releases/download/$MM_VERSION/moin-$MM_VERSION.tar.gz
-RUN if [ "$MM_CSUM" != "$(sha1sum moin-$MM_VERSION.tar.gz | awk '{print($1)}')" ];\
+ &&\ if [ "$MM_CSUM" != "$(sha1sum moin-$MM_VERSION.tar.gz | awk '{print($1)}')" ];\
   then exit 1; fi;
-RUN mkdir moinmoin
-RUN tar xf moin-$MM_VERSION.tar.gz -C moinmoin --strip-components=1
+ &&\ mkdir moinmoin
+ &&\ tar xf moin-$MM_VERSION.tar.gz -C moinmoin --strip-components=1
 
 # Install MoinMoin
 RUN cd moinmoin && python2.7 setup.py install --force --prefix=/usr/local
@@ -48,7 +48,7 @@ ADD nginx.conf /etc/nginx/
 ADD moinmoin-nossl.conf /etc/nginx/sites-available/
 # ADD moinmoin-ssl.conf /etc/nginx/sites-available/
 RUN mkdir -p /var/cache/nginx/cache
-RUN rm /etc/nginx/sites-enabled/default
+ &&\ rm /etc/nginx/sites-enabled/default
 
 # Create self signed certificate
 # ADD generate_ssl_key.sh /usr/local/bin/
@@ -58,10 +58,10 @@ RUN rm /etc/nginx/sites-enabled/default
 
 # Cleanup
 RUN rm moin-$MM_VERSION.tar.gz
-RUN rm -rf /moinmoin
-RUN apt-get purge -qqy curl
-RUN apt-get autoremove -qqy && apt-get clean
-RUN rm -rf /tmp/* /var/lib/apt/lists/*
+ &&\ rm -rf /moinmoin
+ &&\ apt-get purge -qqy curl
+ &&\ apt-get autoremove -qqy && apt-get clean
+ &&\ rm -rf /tmp/* /var/lib/apt/lists/*
 
 # Add the start shell script
 ADD start.sh /usr/local/bin/
@@ -69,6 +69,6 @@ ADD start.sh /usr/local/bin/
 VOLUME /usr/local/share/moin/data
 
 EXPOSE 80
-EXPOSE 443
+# EXPOSE 443
 
 CMD start.sh
